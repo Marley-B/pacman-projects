@@ -133,7 +133,22 @@ def depth_first_search(problem):
     print("Start's successors:", problem.get_successors(problem.get_start_state()))
     """
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    start_state= problem.get_start_state()
+    stack = util.Stack()
+    visited=
+    stack.push((start_state))
+    push(stack, start_state) ## We start the game by pushing the first node
+    while not stack.is_empty(): ## We loop until we f
+        node = stack.pop() ## We pop the current node
+        list_successors = problem.get_successors(node) ## fill the queue with the succesors
+        if(!is_empty(list_successors)) 
+            self.is_lose()
+        for successor, action, cost in list_successors: ## We check for the successors and check if is_goal_state true
+            
+            if(problem.is_goal_state(successor))
+                self.is_win() ##win
+            else
+                push(stack, successor) ## Otherwise, we push the successors
 
 
 
