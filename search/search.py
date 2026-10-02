@@ -135,21 +135,23 @@ def depth_first_search(problem):
     "*** YOUR CODE HERE ***"
     start_state= problem.get_start_state()
     stack = util.Stack()
-    visited=
+    visited = [] ##Array with the visited nodes so we do not check a node twice
+    visited.append(start_state)
     stack.push((start_state))
     push(stack, start_state) ## We start the game by pushing the first node
     while not stack.is_empty(): ## We loop until we f
         node = stack.pop() ## We pop the current node
+        if node in visited ## If we've already visited this node we should skip it
+            continue
         list_successors = problem.get_successors(node) ## fill the queue with the succesors
-        if(!is_empty(list_successors)) 
+        if(is_empty(list_successors)) 
             self.is_lose()
         for successor, action, cost in list_successors: ## We check for the successors and check if is_goal_state true
-            
             if(problem.is_goal_state(successor))
                 self.is_win() ##win
             else
                 push(stack, successor) ## Otherwise, we push the successors
-
+        ##How and when do we add the current node to visited?
 
 
 def breadth_first_search(problem):
