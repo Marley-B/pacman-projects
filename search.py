@@ -140,27 +140,29 @@ def depth_first_search(problem):
     start_state= problem.get_start_state()
     stack = util.Stack()
     visited = [] ##Array with the visited nodes so we do not check a node twice
-    stack.push((start_state, []))  ## We start the game by pushing the first node
-    
-    while not stack.is_empty(): ## We loop until we find the succes node
-        node, path = stack.pop() ## We pop the current node and where it came from
+    stack.push(start_state)  ## We start the game by pushing the first node
+    ##queue = util.Queue()
+    path = []
 
+    while not stack.is_empty(): ## We loop until we find the succes node
+        node = stack.pop() ## We pop the current node
         if node in visited: ## If we've already visited this node we should skip it
             continue
-        
-        if problem.is_goal_state(node): ## Ceck if we are at the goal
-                print("WIN!")
-                print("Length:", len(path))
-                return path
-
         list_successors = problem.get_successors(node) ## ceck the succesors
-        for successor, action, cost in list_successors: 
-            if successor not in visited: 
-                stack.push((successor, (path + [action]))) ## We push the succesor and the path it took to get there
-
+        if len(list_successors) == 0: ## If there are none, we lose
+            ##problem.is_lose()
+            print("Lose")
+            break
+        for successor, action, cost in list_successors: ## We check for the successors and check if is_goal_state true
+            if problem.is_goal_state(successor):
+                ##problem.is_win() ##win
+                print("WIN!")
+                return path
+                break
+            else:
+                stack.push(successor) ## Otherwise, we push the successors
+                path.append(action)
         visited.append(node) ## We mark node as visited once we are finished with it
-
-    return []
 
 
 def breadth_first_search(problem):
