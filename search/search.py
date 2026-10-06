@@ -264,8 +264,8 @@ def a_star_search(problem, heuristic=null_heuristic):
         list_successors = problem.get_successors(node) ## Check the successors
         for successor, action, cost in list_successors: 
             if successor not in visited: 
-                queue.push((successor, (path + [action])), (cost + util.manhattan_distance(successor, problem.goal))) ## We push all the children of the current node
-                queue.update((successor, (path + [action])), (cost + util.manhattan_distance(successor, problem.goal))) ## We update the queue to have it ordered by cost taking into account manhattan_distance 
+                queue.push((successor, (path + [action])), (cost + heuristic(successor, problem.goal))) ## We push all the children of the current node
+                queue.update((successor, (path + [action])), (cost + heuristic(successor, problem.goal))) ## We update the queue to have it ordered by cost taking into account the heuristic 
             
         visited.append(node) ## We mark node as visited once we are finished with it
 
