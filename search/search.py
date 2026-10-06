@@ -173,13 +173,10 @@ def breadth_first_search(problem):
     start_state= problem.get_start_state()
     queue = util.Queue()
     visited = [] ##Array with the visited nodes so we do not check a node twice
-    queue.push((start_state, []))  ## We start the game by pushing the first node
-    if problem.is_goal_state(start_state): ## Check if we are at the goal
-        print("WIN!")
-        return []       
+    queue.push((start_state, []))  ## We start the game by pushing the first node     
 
     while not queue.is_empty(): ## We loop until we find the final node
-        node, path = queue.pop() ## We pop the current node and where it came from
+        node, path = queue.pop() ## We use a queue so that we can ceck layer by layer
 
         if node in visited: ## If we've already visited this node we should skip it
             continue
@@ -192,7 +189,7 @@ def breadth_first_search(problem):
         list_successors = problem.get_successors(node) ## Check the succesors
         for successor, action, cost in list_successors: 
             if successor not in visited: 
-                queue.push((successor, (path + [action]))) ## We push the succesor and the path it took to get there
+                queue.push((successor, (path + [action]))) ## We push all the children of the current node
             
         visited.append(node) ## We mark node as visited once we are finished with it
 
@@ -201,7 +198,37 @@ def breadth_first_search(problem):
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    print("Start:", problem.get_start_state())
+    print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
+    print("Start's successors:", problem.get_successors(problem.get_start_state()))
+
+    start_state= problem.get_start_state()
+    queue = util.PriorityQueue()
+    visited = [] ##Array with the visited nodes so we do not check a node twice
+    queue.push((start_state, []), 0)  ## We start the game by pushing the first node     
+
+    while not queue.is_empty(): ## We loop until we find the final node
+        node, path = queue.pop() ## We use a queue so that we can ceck layer by layer
+
+        if node in visited: ## If we've already visited this node we should skip it
+            continue
+
+        if problem.is_goal_state(node): ## Check if we are at the goal
+                    print("WIN!")
+                    print("Length:", len(path))
+                    print("Cost:", cost)
+                    return path
+                    
+        list_successors = problem.get_successors(node) ## Check the succesors
+        for successor, action, cost in list_successors: 
+            if successor not in visited: 
+                queue.push((successor, (path + [action])), cost) ## We push all the children of the current node
+                queue.update((successor, (path + [action])), cost) ## We update the queue to have it ordered by cost
+            
+        visited.append(node) ## We mark node as visited once we are finished with it
+
+    return []
+
 
 def null_heuristic(state, problem=None):
     """
