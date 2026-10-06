@@ -142,18 +142,18 @@ def depth_first_search(problem):
     visited = [] ##Array with the visited nodes so we do not check a node twice
     stack.push((start_state, []))  ## We start the game by pushing the first node
     
-    while not stack.is_empty(): ## We loop until we find the succes node
+    while not stack.is_empty(): ## We loop until we find the final node
         node, path = stack.pop() ## We pop the current node and where it came from
 
         if node in visited: ## If we've already visited this node we should skip it
             continue
         
-        if problem.is_goal_state(node): ## Ceck if we are at the goal
+        if problem.is_goal_state(node): ## Check if we are at the goal
                 print("WIN!")
                 print("Length:", len(path))
                 return path
 
-        list_successors = problem.get_successors(node) ## ceck the succesors
+        list_successors = problem.get_successors(node) ## Check the succesors
         for successor, action, cost in list_successors: 
             if successor not in visited: 
                 stack.push((successor, (path + [action]))) ## We push the succesor and the path it took to get there
@@ -166,7 +166,37 @@ def depth_first_search(problem):
 def breadth_first_search(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    print("Start:", problem.get_start_state())
+    print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
+    print("Start's successors:", problem.get_successors(problem.get_start_state()))
+
+    start_state= problem.get_start_state()
+    queue = util.Queue()
+    visited = [] ##Array with the visited nodes so we do not check a node twice
+    queue.push((start_state, []))  ## We start the game by pushing the first node
+    if problem.is_goal_state(start_state): ## Check if we are at the goal
+        print("WIN!")
+        return []       
+
+    while not queue.is_empty(): ## We loop until we find the final node
+        node, path = queue.pop() ## We pop the current node and where it came from
+
+        if node in visited: ## If we've already visited this node we should skip it
+            continue
+
+        if problem.is_goal_state(node): ## Check if we are at the goal
+                    print("WIN!")
+                    print("Length:", len(path))
+                    return path
+                    
+        list_successors = problem.get_successors(node) ## Check the succesors
+        for successor, action, cost in list_successors: 
+            if successor not in visited: 
+                queue.push((successor, (path + [action]))) ## We push the succesor and the path it took to get there
+            
+        visited.append(node) ## We mark node as visited once we are finished with it
+
+    return []
 
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
