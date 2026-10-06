@@ -176,7 +176,7 @@ def breadth_first_search(problem):
     queue.push((start_state, []))  ## We start the game by pushing the first node     
 
     while not queue.is_empty(): ## We loop until we find the final node
-        node, path = queue.pop() ## We use a queue so that we can ceck layer by layer
+        node, path = queue.pop() ## We use a queue so that we can check layer by layer
 
         if node in visited: ## If we've already visited this node we should skip it
             continue
@@ -186,7 +186,7 @@ def breadth_first_search(problem):
                     print("Length:", len(path))
                     return path
                     
-        list_successors = problem.get_successors(node) ## Check the succesors
+        list_successors = problem.get_successors(node) ## Check the successors
         for successor, action, cost in list_successors: 
             if successor not in visited: 
                 queue.push((successor, (path + [action]))) ## We push all the children of the current node
@@ -208,7 +208,7 @@ def uniform_cost_search(problem):
     queue.push((start_state, []), 0)  ## We start the game by pushing the first node     
 
     while not queue.is_empty(): ## We loop until we find the final node
-        node, path = queue.pop() ## We use a queue so that we can ceck layer by layer
+        node, path = queue.pop() ## We use a queue so that we can check layer by layer
 
         if node in visited: ## If we've already visited this node we should skip it
             continue
@@ -219,7 +219,7 @@ def uniform_cost_search(problem):
                     print("Cost:", cost)
                     return path
                     
-        list_successors = problem.get_successors(node) ## Check the succesors
+        list_successors = problem.get_successors(node) ## Check the successors
         for successor, action, cost in list_successors: 
             if successor not in visited: 
                 queue.push((successor, (path + [action])), cost) ## We push all the children of the current node
@@ -240,7 +240,39 @@ def null_heuristic(state, problem=None):
 def a_star_search(problem, heuristic=null_heuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    print("Start:", problem.get_start_state())
+    print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
+    print("Start's successors:", problem.get_successors(problem.get_start_state()))
+
+    start_state= problem.get_start_state()
+    queue = util.PriorityQueue()
+    visited = [] ##Array with the visited nodes so we do not check a node twice
+    queue.push((start_state, []), 0)  ## We start the game by pushing the first node     
+
+    while not queue.is_empty(): ## We loop until we find the final node
+        node, path = queue.pop() ## We use a queue so that we can check layer by layer
+
+        if node in visited: ## If we've already visited this node we should skip it
+            continue
+
+        if problem.is_goal_state(node): ## Check if we are at the goal
+                    print("WIN!")
+                    print("Length:", len(path))
+                    print("Cost:", cost)
+                    return path
+                    
+        list_successors = problem.get_successors(node) ## Check the successors
+        for successor, action, cost in list_successors: 
+            if successor not in visited: 
+                queue.push((successor, (path + [action])), (cost + util.manhattan_distance(successor, problem.goal))) ## We push all the children of the current node
+                queue.update((successor, (path + [action])), (cost + util.manhattan_distance(successor, problem.goal))) ## We update the queue to have it ordered by cost taking into account manhattan_distance 
+            
+        visited.append(node) ## We mark node as visited once we are finished with it
+
+    return []
+    
+    
+    
 
 # Abbreviations
 bfs = breadth_first_search
