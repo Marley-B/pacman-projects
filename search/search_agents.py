@@ -543,7 +543,13 @@ def food_heuristic(state, problem):
     """
     position, food_grid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    food_list = food_grid.as_list()
+    max_distance = 0 #We initialize at 0 for assuring that it will return 0 in case of no food 
+    for food in food_list:  #We iterate through the list and if there is remaining food take the largest distance  
+        distance = util.manhattan_distance(position, food)
+        if distance > max_distance: 
+            max_distance = distance
+    return max_distance
 
 
 def simplified_corners_heuristic(state, problem):
