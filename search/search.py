@@ -247,10 +247,10 @@ def a_star_search(problem, heuristic=null_heuristic):
     start_state= problem.get_start_state()
     queue = util.PriorityQueue()
     visited = [] ##Array with the visited nodes so we do not check a node twice
-    queue.push((start_state, []), 0)  ## We start the game by pushing the first node     
+    queue.push((start_state, [], 0), heuristic(start_state, problem))  ## We start the game by pushing the first node     
 
     while not queue.is_empty(): ## We loop until we find the final node
-        node, path = queue.pop() ## We use a queue so that we can check layer by layer
+        node, path, tot_cost = queue.pop() ## We use a queue so that we can check layer by layer
 
         if node in visited: ## If we've already visited this node we should skip it
             continue
@@ -258,14 +258,16 @@ def a_star_search(problem, heuristic=null_heuristic):
         if problem.is_goal_state(node): ## Check if we are at the goal
                     print("WIN!")
                     print("Length:", len(path))
-                    print("Cost:", cost)
+                    print("Cost:", tot_cost)
                     return path
                     
         list_successors = problem.get_successors(node) ## Check the successors
         for successor, action, cost in list_successors: 
             if successor not in visited: 
-                queue.push((successor, (path + [action])), (cost + heuristic(successor, problem))) ## We push all the children of the current node
-                queue.update((successor, (path + [action])), (cost + heuristic(successor, problem))) ## We update the queue to have it ordered by cost taking into account the heuristic 
+                new_cost = tot_cost + cost #cost of the path taken so far
+                new_path = path + [action] #path taken so far
+                priority = new_cost + heuristic(successor, problem)
+                queue.push((successor, new_path, new_cost), priority) ## We push all the children of the current node
             
         visited.append(node) ## We mark node as visited once we are finished with it
 

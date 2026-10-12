@@ -432,6 +432,7 @@ def corners_heuristic(state, problem):
                 if distance < cost_relation[other_rel]:
                     cost_relation[other_rel] = distance
         
+    #print("h =", total_cost, "state =", state)
     return total_cost #return the cost that is left for the algorithm
 
     #we didnt keep this algorithm since in ignoring the closest ones, it backtraked
