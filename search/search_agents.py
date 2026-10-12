@@ -390,8 +390,61 @@ def corners_heuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
+    ## [self.startingPosition, []]
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    
+    ## MST with Prim's algorithm #https://medium.com/@sandhyamorla/prims-algorithm-for-minimum-spanning-tree-mst-b368ffb453a7
+    #https://www.geeksforgeeks.org/dsa/prims-minimum-spanning-tree-mst-greedy-algo-5/
+    position, visited = state
+
+    if len(visited) >= len(corners):
+        return 0
+
+    remaining = [cor for cor in corners if cor not in visited] #we only care for the unvisted corners
+    relations = [position] + list(remaining) #all the paths we must consider, pacman to all remaining corners
+    num_rel = len(relations)
+    cost_relation = [float('inf')] * num_rel #start all relations with def value
+    connected = [False] * num_rel #track if we have used that relation
+
+    cost_relation[0] = 0 #start from pacman's position
+    total_cost = 0 #cost of the path we take
+
+    for i in range(num_rel): #loop trough all relations to add them to the tree
+
+        #dicide what relation we are using next
+        min_rel = None
+        min_cost = float('inf')
+        for relation in range(num_rel):
+            if not connected[relation] and cost_relation[relation] < min_cost: #go to the chepest corner
+                min_rel = relation
+                min_cost = cost_relation[relation]
+
+        if min_rel is None:   # nothing left to add
+            break
+        # add the chosen relation to the tree
+        connected[min_rel] = True
+        total_cost += min_cost
+
+        #update costs from where we are now to the other relations if they have improved
+        for other_rel in range(num_rel): 
+            if not connected[other_rel]:
+                distance = util.manhattan_distance(relations[min_rel], relations[other_rel])
+                if distance < cost_relation[other_rel]:
+                    cost_relation[other_rel] = distance
+        
+    return total_cost #return the cost that is left for the algorithm
+
+    #we didnt keep this algorithm since in ignoring the closest ones, it backtraked
+    """
+    position, visited = state
+    max_distance = 0
+    for corner in corners:
+        if corner not in visited:
+            distance = util.manhattan_distance(position, corner)
+            if distance > max_distance: 
+                max_distance = distance
+    return max_distance 
+    """
 
 class AStarCornersAgent(SearchAgent):
     """A SearchAgent for FoodSearchProblem using A* and your food_heuristic"""
@@ -550,6 +603,8 @@ def food_heuristic(state, problem):
         if distance > max_distance: 
             max_distance = distance
     return max_distance
+
+    
 
 
 def simplified_corners_heuristic(state, problem):
