@@ -597,6 +597,50 @@ def food_heuristic(state, problem):
     """
     position, food_grid = state
     "*** YOUR CODE HERE ***"
+
+    ## MST with Prim's algorithm #https://medium.com/@sandhyamorla/prims-algorithm-for-minimum-spanning-tree-mst-b368ffb453a7
+    #https://www.geeksforgeeks.org/dsa/prims-minimum-spanning-tree-mst-greedy-algo-5/
+
+    food_list = food_grid.as_list()
+    if not food_list:
+        return 0
+
+    relations = [position] + food_list #all the paths we must consider, pacman to all remaining food
+    num_rel = len(relations)
+    cost_relation = [float('inf')] * num_rel #start all relations with def value
+    connected = [False] * num_rel #track if we have used that relation
+
+    cost_relation[0] = 0 #start from pacman's position
+    total_cost = 0 #cost of the path we take
+
+    for i in range(num_rel): #loop trough all relations to add them to the tree
+
+        #dicide what relation we are using next
+        min_rel = None
+        min_cost = float('inf')
+        for relation in range(num_rel):
+            if not connected[relation] and cost_relation[relation] < min_cost: #go to the chepest food relation
+                min_rel = relation
+                min_cost = cost_relation[relation]
+
+        if min_rel is None:   # nothing left to add
+            break
+        # add the chosen relation to the tree
+        connected[min_rel] = True
+        total_cost += min_cost
+
+        #update costs from where we are now to the other relations if they have improved
+        for other_rel in range(num_rel): 
+            if not connected[other_rel]:
+                distance = util.manhattan_distance(relations[min_rel], relations[other_rel])
+                if distance < cost_relation[other_rel]:
+                    cost_relation[other_rel] = distance
+        
+    #print("Food: ", food_list)
+    return total_cost #return the cost that is left for the algorithm
+
+    #we didnt keep this algorithm since in ignoring the closest ones, it backtraked
+    """
     food_list = food_grid.as_list()
     max_distance = 0 #We initialize at 0 for assuring that it will return 0 in case of no food 
     for food in food_list:  #We iterate through the list and if there is remaining food take the largest distance  
@@ -604,7 +648,7 @@ def food_heuristic(state, problem):
         if distance > max_distance: 
             max_distance = distance
     return max_distance
-
+    """
     
 
 
