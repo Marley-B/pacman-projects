@@ -294,6 +294,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.starting_game_state = starting_game_state
 
     def get_start_state(self):
         """
@@ -392,48 +393,6 @@ def corners_heuristic(state, problem):
 
     ## [self.startingPosition, []]
     "*** YOUR CODE HERE ***"
-    
-    ## MST with Prim's algorithm #https://medium.com/@sandhyamorla/prims-algorithm-for-minimum-spanning-tree-mst-b368ffb453a7
-    #https://www.geeksforgeeks.org/dsa/prims-minimum-spanning-tree-mst-greedy-algo-5/
-    position, visited = state
-
-    if len(visited) >= len(corners):
-        return 0
-
-    remaining = [cor for cor in corners if cor not in visited] #we only care for the unvisted corners
-    relations = [position] + list(remaining) #all the paths we must consider, pacman to all remaining corners
-    num_rel = len(relations)
-    cost_relation = [float('inf')] * num_rel #start all relations with def value
-    connected = [False] * num_rel #track if we have used that relation
-
-    cost_relation[0] = 0 #start from pacman's position
-    total_cost = 0 #cost of the path we take
-
-    for i in range(num_rel): #loop trough all relations to add them to the tree
-
-        #dicide what relation we are using next
-        min_rel = None
-        min_cost = float('inf')
-        for relation in range(num_rel):
-            if not connected[relation] and cost_relation[relation] < min_cost: #go to the chepest corner
-                min_rel = relation
-                min_cost = cost_relation[relation]
-
-        if min_rel is None:   # nothing left to add
-            break
-        # add the chosen relation to the tree
-        connected[min_rel] = True
-        total_cost += min_cost
-
-        #update costs from where we are now to the other relations if they have improved
-        for other_rel in range(num_rel): 
-            if not connected[other_rel]:
-                distance = util.manhattan_distance(relations[min_rel], relations[other_rel])
-                if distance < cost_relation[other_rel]:
-                    cost_relation[other_rel] = distance
-        
-    #print("h =", total_cost, "state =", state)
-    return total_cost #return the cost that is left for the algorithm
 
     #we didnt keep this algorithm since in ignoring the closest ones, it backtraked
     """
@@ -446,6 +405,53 @@ def corners_heuristic(state, problem):
                 max_distance = distance
     return max_distance 
     """
+
+    ## MST with Prim's algorithm #https://medium.com/@sandhyamorla/prims-algorithm-for-minimum-spanning-tree-mst-b368ffb453a7
+    #https://www.geeksforgeeks.org/dsa/prims-minimum-spanning-tree-mst-greedy-algo-5/
+
+    position, visited = state
+
+    remaining = [cor for cor in corners if cor not in visited] #we only care for the unvisted corners
+    if not remaining: # If all corners are visited, the remaining cost is 0
+        return 0
+    num_rem = len(remaining)
+
+    if num_rem == 1: #if only one remaining, no need to ceck its relations
+        mst_cost = 0
+    else:
+        cost_relation = [float('inf')] * num_rem #start all relations with def value
+        connected = [False] * num_rem #track if we have used that relation
+        cost_relation[0] = 0  #start from the first remaining corner
+        mst_cost = 0
+
+        for _ in range(num_rem):
+
+            #dicide what relation we are using next
+            min_rel = None
+            min_cost = float('inf')
+            for relation in range(num_rem):
+                if not connected[relation] and cost_relation[relation] < min_cost: #go to the chepest corner
+                    min_rel = relation
+                    min_cost = cost_relation[relation]
+
+            if min_rel is None:
+                break
+            connected[min_rel] = True
+            mst_cost += min_cost
+
+            # Update costs to other unvisited corners if they have improved
+            for other in range(num_rem):
+                if not connected[other]:
+                    dist = maze_distance(remaining[min_rel], remaining[other], problem.starting_game_state)
+                    if dist < cost_relation[other]:
+                        cost_relation[other] = dist
+
+    # distance from Pacman's current position to the nearest unvisited corner
+    min_dist_to_corner = min(maze_distance(position, cor, problem.starting_game_state) for cor in remaining)
+    # we calculate this outside since doing it inside would change the nodes each computation with Pacman's movment and be inconsistent
+
+    # total heuristic = MST of remaining corners + distance Pacman to nearest corner
+    return mst_cost + min_dist_to_corner
 
 class AStarCornersAgent(SearchAgent):
     """A SearchAgent for FoodSearchProblem using A* and your food_heuristic"""
@@ -597,7 +603,7 @@ def food_heuristic(state, problem):
     """
     position, food_grid = state
     "*** YOUR CODE HERE ***"
-
+    """
     ## MST with Prim's algorithm #https://medium.com/@sandhyamorla/prims-algorithm-for-minimum-spanning-tree-mst-b368ffb453a7
     #https://www.geeksforgeeks.org/dsa/prims-minimum-spanning-tree-mst-greedy-algo-5/
 
@@ -641,6 +647,7 @@ def food_heuristic(state, problem):
 
     #we didnt keep this algorithm since in ignoring the closest ones, it backtraked
     """
+    """
     food_list = food_grid.as_list()
     max_distance = 0 #We initialize at 0 for assuring that it will return 0 in case of no food 
     for food in food_list:  #We iterate through the list and if there is remaining food take the largest distance  
@@ -649,6 +656,52 @@ def food_heuristic(state, problem):
             max_distance = distance
     return max_distance
     """
+    ## MST with Prim's algorithm #https://medium.com/@sandhyamorla/prims-algorithm-for-minimum-spanning-tree-mst-b368ffb453a7
+    #https://www.geeksforgeeks.org/dsa/prims-minimum-spanning-tree-mst-greedy-algo-5/
+
+    position, visited = state
+
+    food_list = food_grid.as_list()
+    if not food_list:
+        return 0
+    num_rem = len(food_list)
+
+    if num_rem == 1: #if only one food remaining, no need to ceck its relations
+        mst_cost = 0
+    else:
+        cost_relation = [float('inf')] * num_rem #start all relations with def value
+        connected = [False] * num_rem #track if we have used that relation
+        cost_relation[0] = 0  #start from the first food in the list
+        mst_cost = 0
+
+        for _ in range(num_rem):
+
+            #dicide what relation we are using next
+            min_rel = None
+            min_cost = float('inf')
+            for relation in range(num_rem):
+                if not connected[relation] and cost_relation[relation] < min_cost: #go to the chepest food
+                    min_rel = relation
+                    min_cost = cost_relation[relation]
+
+            if min_rel is None:
+                break
+            connected[min_rel] = True
+            mst_cost += min_cost
+
+            # Update costs to other unvisited corners if they have improved
+            for other in range(num_rem):
+                if not connected[other]:
+                    dist = maze_distance(food_list[min_rel], food_list[other], problem.starting_game_state)
+                    if dist < cost_relation[other]:
+                        cost_relation[other] = dist
+
+    # distance from Pacman's current position to the nearest unvisited food
+    min_dist_to_food = min(maze_distance(position, cor, problem.starting_game_state) for cor in food_list)
+    # we calculate this outside since doing it inside would change the nodes each computation with Pacman's movment and be inconsistent
+
+    # total heuristic = MST of remaining foos + distance Pacman to nearest foos
+    return mst_cost + min_dist_to_food
     
 
 

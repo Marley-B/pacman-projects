@@ -133,9 +133,9 @@ def depth_first_search(problem):
     print("Start's successors:", problem.get_successors(problem.get_start_state()))
     """
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.get_start_state())
-    print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
-    print("Start's successors:", problem.get_successors(problem.get_start_state()))
+    #print("Start:", problem.get_start_state())
+    #print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
+    #print("Start's successors:", problem.get_successors(problem.get_start_state()))
 
     start_state= problem.get_start_state()
     stack = util.Stack()
@@ -149,8 +149,8 @@ def depth_first_search(problem):
             continue
         
         if problem.is_goal_state(node): ## Check if we are at the goal
-                print("WIN!")
-                print("Length:", len(path))
+                #print("WIN!")
+                #print("Length:", len(path))
                 return path
 
         list_successors = problem.get_successors(node) ## Check the succesors
@@ -166,9 +166,9 @@ def depth_first_search(problem):
 def breadth_first_search(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.get_start_state())
-    print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
-    print("Start's successors:", problem.get_successors(problem.get_start_state()))
+    #print("Start:", problem.get_start_state())
+    #print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
+    #print("Start's successors:", problem.get_successors(problem.get_start_state()))
 
     start_state= problem.get_start_state()
     queue = util.Queue()
@@ -182,8 +182,8 @@ def breadth_first_search(problem):
             continue
 
         if problem.is_goal_state(node): ## Check if we are at the goal
-                    print("WIN!")
-                    print("Length:", len(path))
+                    #print("WIN!")
+                    #print("Length:", len(path))
                     return path
                     
         list_successors = problem.get_successors(node) ## Check the successors
@@ -198,32 +198,35 @@ def breadth_first_search(problem):
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.get_start_state())
-    print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
-    print("Start's successors:", problem.get_successors(problem.get_start_state()))
+    #print("Start:", problem.get_start_state())
+    #print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
+    #print("Start's successors:", problem.get_successors(problem.get_start_state()))
 
     start_state= problem.get_start_state()
     queue = util.PriorityQueue()
     visited = [] ##Array with the visited nodes so we do not check a node twice
-    queue.push((start_state, []), 0)  ## We start the game by pushing the first node     
+    queue.push((start_state, [], 0), 0)  ## We start the game by pushing the first node     
 
     while not queue.is_empty(): ## We loop until we find the final node
-        node, path = queue.pop() ## We use a queue so that we can check layer by layer
+        node, path, tot_cost = queue.pop() ## We use a queue so that we can check layer by layer
 
         if node in visited: ## If we've already visited this node we should skip it
             continue
 
         if problem.is_goal_state(node): ## Check if we are at the goal
-                    print("WIN!")
-                    print("Length:", len(path))
-                    print("Cost:", cost)
+                    #print("WIN!")
+                    #print("Length:", len(path))
+                    #print("Cost:", cost)
                     return path
                     
         list_successors = problem.get_successors(node) ## Check the successors
         for successor, action, cost in list_successors: 
             if successor not in visited: 
-                queue.push((successor, (path + [action])), cost) ## We push all the children of the current node
-                queue.update((successor, (path + [action])), cost) ## We update the queue to have it ordered by cost
+                new_cost = tot_cost + cost #cost of the path taken so far
+                new_path = path + [action] #path taken so far
+                queue.push((successor, new_path, new_cost), new_cost)
+                #queue.push(((successor, (path + [action])), tot_cost), tot_cost )## We push all the children of the current node
+                #queue.update((successor, (path + [action])), cost) ## We update the queue to have it ordered by cost
             
         visited.append(node) ## We mark node as visited once we are finished with it
 
@@ -240,9 +243,9 @@ def null_heuristic(state, problem=None):
 def a_star_search(problem, heuristic=null_heuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.get_start_state())
-    print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
-    print("Start's successors:", problem.get_successors(problem.get_start_state()))
+    #print("Start:", problem.get_start_state())
+    #print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
+    #print("Start's successors:", problem.get_successors(problem.get_start_state()))
 
     start_state= problem.get_start_state()
     queue = util.PriorityQueue()
@@ -256,9 +259,9 @@ def a_star_search(problem, heuristic=null_heuristic):
             continue
 
         if problem.is_goal_state(node): ## Check if we are at the goal
-                    print("WIN!")
-                    print("Length:", len(path))
-                    print("Cost:", tot_cost)
+                    #print("WIN!")
+                    #print("Length:", len(path))
+                    #print("Cost:", tot_cost)
                     return path
                     
         list_successors = problem.get_successors(node) ## Check the successors
