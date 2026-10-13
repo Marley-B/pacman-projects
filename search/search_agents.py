@@ -377,7 +377,7 @@ def corners_heuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
 
-      state:   The current search state
+      state:   The current search statecor
                (a data structure you chose in your search problem)
                In our case ((x,y), remainingCornerns)
 
@@ -615,7 +615,7 @@ def food_heuristic(state, problem):
 
     for i in range(num_rel): #loop trough all relations to add them to the tree
 
-        #dicide what relation we are using next
+        #decide what relation we are using next
         min_rel = None
         min_cost = float('inf')
         for relation in range(num_rel):
