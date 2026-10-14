@@ -603,50 +603,8 @@ def food_heuristic(state, problem):
     """
     position, food_grid = state
     "*** YOUR CODE HERE ***"
-    """
-    ## MST with Prim's algorithm #https://medium.com/@sandhyamorla/prims-algorithm-for-minimum-spanning-tree-mst-b368ffb453a7
-    #https://www.geeksforgeeks.org/dsa/prims-minimum-spanning-tree-mst-greedy-algo-5/
-
-    food_list = food_grid.as_list()
-    if not food_list:
-        return 0
-
-    relations = [position] + food_list #all the paths we must consider, pacman to all remaining food
-    num_rel = len(relations)
-    cost_relation = [float('inf')] * num_rel #start all relations with def value
-    connected = [False] * num_rel #track if we have used that relation
-
-    cost_relation[0] = 0 #start from pacman's position
-    total_cost = 0 #cost of the path we take
-
-    for i in range(num_rel): #loop trough all relations to add them to the tree
-
-        #decide what relation we are using next
-        min_rel = None
-        min_cost = float('inf')
-        for relation in range(num_rel):
-            if not connected[relation] and cost_relation[relation] < min_cost: #go to the chepest food relation
-                min_rel = relation
-                min_cost = cost_relation[relation]
-
-        if min_rel is None:   # nothing left to add
-            break
-        # add the chosen relation to the tree
-        connected[min_rel] = True
-        total_cost += min_cost
-
-        #update costs from where we are now to the other relations if they have improved
-        for other_rel in range(num_rel): 
-            if not connected[other_rel]:
-                distance = util.manhattan_distance(relations[min_rel], relations[other_rel])
-                if distance < cost_relation[other_rel]:
-                    cost_relation[other_rel] = distance
-        
-    #print("Food: ", food_list)
-    return total_cost #return the cost that is left for the algorithm
-
+ 
     #we didnt keep this algorithm since in ignoring the closest ones, it backtraked
-    """
     """
     food_list = food_grid.as_list()
     max_distance = 0 #We initialize at 0 for assuring that it will return 0 in case of no food 
@@ -666,7 +624,7 @@ def food_heuristic(state, problem):
         return 0
     num_rem = len(food_list)
 
-    if num_rem == 1: #if only one food remaining, no need to ceck its relations
+    if num_rem == 1: #if only one food remaining, no need to check its relations
         mst_cost = 0
     else:
         cost_relation = [float('inf')] * num_rem #start all relations with def value
@@ -676,11 +634,11 @@ def food_heuristic(state, problem):
 
         for _ in range(num_rem):
 
-            #dicide what relation we are using next
+            #decide what relation we are using next
             min_rel = None
             min_cost = float('inf')
             for relation in range(num_rem):
-                if not connected[relation] and cost_relation[relation] < min_cost: #go to the chepest food
+                if not connected[relation] and cost_relation[relation] < min_cost: #go to the cheapest food
                     min_rel = relation
                     min_cost = cost_relation[relation]
 
@@ -698,9 +656,9 @@ def food_heuristic(state, problem):
 
     # distance from Pacman's current position to the nearest unvisited food
     min_dist_to_food = min(maze_distance(position, cor, problem.starting_game_state) for cor in food_list)
-    # we calculate this outside since doing it inside would change the nodes each computation with Pacman's movment and be inconsistent
+    # we calculate this outside since doing it inside would change the nodes each computation with Pacman's movement and be inconsistent
 
-    # total heuristic = MST of remaining foos + distance Pacman to nearest foos
+    # total heuristic = MST of remaining food + distance Pacman to nearest food
     return mst_cost + min_dist_to_food
     
 
@@ -758,7 +716,7 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
         path_to_closest_dot = search.breadth_first_search(problem) #We use BFS since it will search layer by layer until it finds the first food
-        return path_to_closest_dot
+        return path_to_closest_dot #In case of tie there might be the case in which having decide to go towards one direction will result in leaving a dot that in the optimal solution should have been eaten
 
 
 
@@ -797,7 +755,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        return self.food[x][y]
+        return self.food[x][y] #is_goal_state returns true when Pacman is eactly at the position of a food
         
 
 def maze_distance(point1, point2, game_state):
