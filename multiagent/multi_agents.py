@@ -84,9 +84,8 @@ class ReflexAgent(Agent):
         ghost_scared = 0
         num_ghost = len(ghosts_position)
 
-        # we look for the distance and the state of the nearest ghost
+        # we look through all the ghosts and add their properties to grade
         for i in range(num_ghost):
-            #if manhattan_distance(new_pos, ghosts_position[i]) < distance_to_ghost:
             distance_to_ghost = manhattan_distance(new_pos, ghosts_position[i])
             ghost_scared = new_scared_times[i]
 
@@ -99,12 +98,11 @@ class ReflexAgent(Agent):
             #if the ghost is far and harmfull, we ignore it
 
 
-        #if there is no more food
-        if not food_position:
+        if not food_position: #if there is no more food
             food_grade = 0
         else:
             distance_to_food = min(manhattan_distance(new_pos, food)for food in food_position)
-            food_grade = 1/(distance_to_food+1)
+            food_grade = 1/(distance_to_food+1) # [0,1]
 
         #print(ghost_grade, food_grade, num_ghost)
         return successor_game_state.get_score() + ghost_grade + food_grade
