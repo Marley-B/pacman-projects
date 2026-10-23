@@ -697,7 +697,7 @@ def food_heuristic(state, problem):
                         cost_relation[other] = dist
 
     # distance from Pacman's current position to the nearest unvisited food
-    min_dist_to_food = min(maze_distance(position, cor, problem.starting_game_state) for cor in food_list)
+    min_dist_to_food = min(maze_distance(position, food, problem.starting_game_state) for food in food_list)
     # we calculate this outside since doing it inside would change the nodes each computation with Pacman's movment and be inconsistent
 
     # total heuristic = MST of remaining foos + distance Pacman to nearest foos
