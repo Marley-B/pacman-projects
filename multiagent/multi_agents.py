@@ -76,22 +76,40 @@ class ReflexAgent(Agent):
         "*** YOUR CODE HERE ***"
         # get the gost's positions and the food's as lists
         ghosts_position = successor_game_state.get_ghost_positions()
-        food_list = new_food.as_list()
+        food_position = new_food.as_list()
 
-        ghost_grade = 100000
+        ghost_grade = 0
         food_grade = 0
+        distance_to_ghost = float('inf')
+        ghost_scared = 0
+        num_ghost = len(ghosts_position)
 
-        distance_to_ghost = min(manhattan_distance(new_pos, ghost)for ghost in ghosts_position)
-        if distance_to_ghost < 10:
-            ghost_grade = distance_to_ghost*1.5
+        # we look for the distance and the state of the nearest ghost
+        for i in range(num_ghost):
+            if manhattan_distance(new_pos, ghosts_position[i]) < distance_to_ghost:
+                distance_to_ghost = manhattan_distance(new_pos, ghosts_position[i])
+                ghost_scared = new_scared_times[i]
+        ghost_grade = distance_to_ghost
 
-        if not food_list:
-            distance_to_food = 0
+        # if we can eat the nearest ghost we reward going to it
+        if ghost_scared > 0:
+            ghost_grade = 1/(ghost_grade+1)
+        #if the ghost is agressive and close we discourage approching it
+        elif distance_to_ghost < 5: 
+            ghost_grade = (-1/(ghost_grade+1))*1.1  #1.1 whaight on the ghost so it prioritizes surviving over food
+        #if the ghost is far and harmfull, we ignore it
         else:
-            distance_to_food = min(manhattan_distance(new_pos, food)for food in food_list)
-        food_grade = distance_to_food
+            ghost_grade = 0
 
-        return successor_game_state.get_score() + (ghost_grade + 1/food_grade)
+        #if there is no more food
+        if not food_position:
+            food_grade = 0
+        else:
+            distance_to_food = min(manhattan_distance(new_pos, food)for food in food_position)
+            food_grade = 1/(distance_to_food+1)
+
+        #print(ghost_grade, food_grade)
+        return successor_game_state.get_score() + ghost_grade + food_grade
 
 def score_evaluation_function(current_game_state):
     """
