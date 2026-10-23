@@ -86,20 +86,18 @@ class ReflexAgent(Agent):
 
         # we look for the distance and the state of the nearest ghost
         for i in range(num_ghost):
-            if manhattan_distance(new_pos, ghosts_position[i]) < distance_to_ghost:
-                distance_to_ghost = manhattan_distance(new_pos, ghosts_position[i])
-                ghost_scared = new_scared_times[i]
-        ghost_grade = distance_to_ghost
+            #if manhattan_distance(new_pos, ghosts_position[i]) < distance_to_ghost:
+            distance_to_ghost = manhattan_distance(new_pos, ghosts_position[i])
+            ghost_scared = new_scared_times[i]
 
-        # if we can eat the nearest ghost we reward going to it
-        if ghost_scared > 0:
-            ghost_grade = 1/(ghost_grade+1)
-        #if the ghost is agressive and close we discourage approching it
-        elif distance_to_ghost < 5: 
-            ghost_grade = (-1/(ghost_grade+1))*1.1  #1.1 whaight on the ghost so it prioritizes surviving over food
-        #if the ghost is far and harmfull, we ignore it
-        else:
-            ghost_grade = 0
+            # if we can eat the nearest ghost we reward going to it
+            if ghost_scared > 0:
+                ghost_grade += 1/(distance_to_ghost+1)
+            #if the ghost is agressive and close we discourage approching it
+            elif distance_to_ghost < 5: 
+                ghost_grade += (-1/(distance_to_ghost+1))*1.1  #1.1 whaight on the ghost so it prioritizes surviving over food
+            #if the ghost is far and harmfull, we ignore it
+
 
         #if there is no more food
         if not food_position:
@@ -108,7 +106,7 @@ class ReflexAgent(Agent):
             distance_to_food = min(manhattan_distance(new_pos, food)for food in food_position)
             food_grade = 1/(distance_to_food+1)
 
-        #print(ghost_grade, food_grade)
+        #print(ghost_grade, food_grade, num_ghost)
         return successor_game_state.get_score() + ghost_grade + food_grade
 
 def score_evaluation_function(current_game_state):
