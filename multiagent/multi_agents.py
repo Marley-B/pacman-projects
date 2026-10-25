@@ -92,9 +92,9 @@ class ReflexAgent(Agent):
             # if we can eat the nearest ghost we reward going to it
             if ghost_scared > 0:
                 ghost_grade += 1/(distance_to_ghost+1)
-            #if the ghost is agressive and close we discourage approching it
+            #if the ghost is agressive and close we discourage approaching it
             elif distance_to_ghost < 5: 
-                ghost_grade += (-1/(distance_to_ghost+1))*1.1  #1.1 whaight on the ghost so it prioritizes surviving over food
+                ghost_grade += (-1/(distance_to_ghost+1))*1.1  #1.1 weight on the ghost so it prioritizes surviving over food
             #if the ghost is far and harmfull, we ignore it
 
 
@@ -167,8 +167,59 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
-    
+        agent_index = 0
+        actions = game_state.get_legal_actions(agent_index)
+        best_action = actions[0]
+        max_value = float("-inf")
+        for action in actions: 
+            successor = game_state.generate_successor(agent_index, action)
+            value = minimax(self, successor, 1, 4)
+            if value > max_value:
+                max_value = value
+                best_action = action
+        return best_action
+    """         for agent_index in range(num_agents):
+            if self.depth == 4:
+                if game_state.is_win():
+                    return 1
+                elif game_state.is_lose():
+                    return -1
+                else:
+                    return 0
+            if agent_index == 0: 
+                nodes = game_state.get_legal_actions(agent_index)
+                max_node = nodes[0]
+                maximum = float("-inf")
+                for node in nodes:
+                    value = self.evaluation_function(self, node)
+                    if maximum < value:
+                        maximum = value
+                        max_node = node
+                return max_node
+            else:
+                nodes = game_state.get_legal_actions(agent_index)
+                min_node = nodes[0]
+                minimum = float("inf")
+                for node in nodes:
+                    value = self.evaluation_function(self, node)
+                    if minimum > value:
+                        minimum = value
+                        min_node = node
+                return min_node """
+    def minimax(self, game_state, index, depth):
+        num_agents = game_state.get_num_agents()
+        if depth == 0 or game_state.is_win() or game_state.is_lose():
+            return self.evaluation_function(game_state)
+        else:
+            if index == 0:
+                nodes = game_state.get_legal_actions(index)
+                return max(minimax(self, node, (index+1)%num_agents, depth)for node in nodes)
+            else:
+                nodes = game_state.get_legal_actions(index)
+                if agent_index == num_agents - 1:
+                    return min(minimax(self, node, (index+1)%num_agents, depth - 1)for node in nodes)
+                return min(minimax(self, node, (index+1)%num_agents, depth)for node in nodes)
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
