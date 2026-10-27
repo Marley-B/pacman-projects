@@ -142,7 +142,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
     Your minimax agent (question 2)
     """
-
     def get_action(self, game_state):
         """
         Returns the minimax action from the current game_state using self.depth
@@ -167,58 +166,29 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        agent_index = 0
-        actions = game_state.get_legal_actions(agent_index)
-        best_action = actions[0]
-        max_value = float("-inf")
-        for action in actions: 
-            successor = game_state.generate_successor(agent_index, action)
-            value = minimax(self, successor, 1, 4)
-            if value > max_value:
-                max_value = value
+        def minimax(state, index, depth):
+            if depth == 0 or state.is_win() or state.is_lose(): #Base case
+                return self.evaluation_function(state)
+            else:
+                actions = state.get_legal_actions(index)
+                num_agents = state.get_num_agents()
+                next_agent = (index + 1) % num_agents
+                new_depth = depth - 1 if  next_agent == 0 else depth
+                if index == 0:
+                    return max(minimax(state.generate_successor(index, action), next_agent, new_depth)for action in actions) #Recursive case for Pacman
+                else:
+                    return min(minimax(state.generate_successor(index, action), next_agent, new_depth)for action in actions) #Recursive case for ghosts
+        
+        actions = game_state.get_legal_actions(0) #We start with Pacman
+        best_value = float('-inf')
+        best_action = None
+        for action in actions:
+            value = minimax(game_state.generate_successor(0, action), 1, self.depth) #We start the call with Pacman and its actions
+            if best_value < value:
+                best_value = value
                 best_action = action
         return best_action
-    """         for agent_index in range(num_agents):
-            if self.depth == 4:
-                if game_state.is_win():
-                    return 1
-                elif game_state.is_lose():
-                    return -1
-                else:
-                    return 0
-            if agent_index == 0: 
-                nodes = game_state.get_legal_actions(agent_index)
-                max_node = nodes[0]
-                maximum = float("-inf")
-                for node in nodes:
-                    value = self.evaluation_function(self, node)
-                    if maximum < value:
-                        maximum = value
-                        max_node = node
-                return max_node
-            else:
-                nodes = game_state.get_legal_actions(agent_index)
-                min_node = nodes[0]
-                minimum = float("inf")
-                for node in nodes:
-                    value = self.evaluation_function(self, node)
-                    if minimum > value:
-                        minimum = value
-                        min_node = node
-                return min_node """
-    def minimax(self, game_state, index, depth):
-        num_agents = game_state.get_num_agents()
-        if depth == 0 or game_state.is_win() or game_state.is_lose():
-            return self.evaluation_function(game_state)
-        else:
-            if index == 0:
-                nodes = game_state.get_legal_actions(index)
-                return max(minimax(self, node, (index+1)%num_agents, depth)for node in nodes)
-            else:
-                nodes = game_state.get_legal_actions(index)
-                if agent_index == num_agents - 1:
-                    return min(minimax(self, node, (index+1)%num_agents, depth - 1)for node in nodes)
-                return min(minimax(self, node, (index+1)%num_agents, depth)for node in nodes)
+        
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
