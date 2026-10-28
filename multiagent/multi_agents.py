@@ -201,7 +201,28 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluation_function
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        def max-value(state, alpha, beta):
+            v = float('-inf')
+            for successor in state:
+                v = max(v, min-value(successor, max(v, alpha), beta))
+                if v > beta: # if we have found a beta smaller than the current max in the branch, we prune
+                    return v
+                alpha = max(v, alpha)
+            return v
+
+        def max-value(state, alpha, beta):
+            v = float('inf')
+            for successor in state:
+                v = min(v, max-value(successor, alpha, min(v, beta)))
+                if v < alpha: # if we have found an alpha biger than the current min in the branch, we prune
+                    return v
+                beta = min(v, beta)
+            return v
+        
+        alpha = float('-inf')
+        beta = float('inf')
+        # lo de succesors esta mal...
+        return max-value(game_state.generate_successor(0, action) ,alpha, beta) #We start with Pacman aka the max player
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
