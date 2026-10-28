@@ -183,7 +183,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         best_value = float('-inf')
         best_action = None
         for action in actions:
-            value = minimax(game_state.generate_successor(0, action), 1, self.depth) #We start the call with Pacman and its actions
+            value = minimax(game_state.generate_successor(0, action), 1, self.depth) #We start the call with Pacman and its actions, but it will be the turn of the ghost
             if best_value < value:
                 best_value = value
                 best_action = action
@@ -201,28 +201,54 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluation_function
         """
         "*** YOUR CODE HERE ***"
-        def max-value(state, alpha, beta):
-            v = float('-inf')
-            for successor in state:
-                v = max(v, min-value(successor, max(v, alpha), beta))
-                if v > beta: # if we have found a beta smaller than the current max in the branch, we prune
-                    return v
-                alpha = max(v, alpha)
-            return v
+        def max_value(state, alpha, beta, index, depth):
+            if depth == 0 or state.is_win() or state.is_lose(): #Base case
+                return self.evaluation_function(state)
+            else: 
+                v = float('-inf')
+                actions = state.get_legal_actions(index)
+                num_agents = state.get_num_agents()
+                next_agent = (index + 1) % num_agents
+                new_depth = depth - 1 if  next_agent == 0 else depth
+                for action in actions:
+                    v = max(v, min_value(state.generate_successor(index, action), alpha, beta, next_agent, new_depth))
+                    if v > beta: # if we have found a beta smaller than the current max in the branch, we prune
+                        return v
+                    alpha = max(v, alpha) #Update alpha for the next child
+                return v
 
-        def max-value(state, alpha, beta):
-            v = float('inf')
-            for successor in state:
-                v = min(v, max-value(successor, alpha, min(v, beta)))
-                if v < alpha: # if we have found an alpha biger than the current min in the branch, we prune
-                    return v
-                beta = min(v, beta)
-            return v
+        def min_value(state, alpha, beta, index, depth):
+            if depth == 0 or state.is_win() or state.is_lose(): #Base case
+                return self.evaluation_function(state)
+            else:
+                v = float('inf')
+                actions = state.get_legal_actions(index)
+                num_agents = state.get_num_agents()
+                next_agent = (index + 1) % num_agents
+                new_depth = depth - 1 if  next_agent == 0 else depth
+                for action in actions:
+                    if next_agent == 0:
+                        v_child = max_value(state.generate_successor(index, action), alpha, beta, next_agent, new_depth) #In case Pacman is the next_agent
+                    else:
+                        v_child = min_value(state.generate_successor(index, action), alpha, beta, next_agent, new_depth) #In case a ghost is the next_agent
+                    v = min(v_child, v) #In both cases the ghost will minimize
+                    if v < alpha: # if we have found an alpha biger than the current min in the branch, we prune
+                        return v
+                    beta = min(v, beta) #Update beta for the next child
+                return v
         
         alpha = float('-inf')
         beta = float('inf')
-        # lo de succesors esta mal...
-        return max-value(game_state.generate_successor(0, action) ,alpha, beta) #We start with Pacman aka the max player
+        best_action = None
+        best_value = float('-inf')
+        actions = game_state.get_legal_actions(0)
+        for action in actions:
+            value = min_value(game_state.generate_successor(0, action), alpha, beta, 1, self.depth) #We start with Pacman aka the max player, but since the next agent will be a ghost we use min_value
+            if best_value < value:
+                best_value = value
+                best_action = action
+            alpha = max(best_value, alpha) #Since we're Pacman we maximize
+        return best_action
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
