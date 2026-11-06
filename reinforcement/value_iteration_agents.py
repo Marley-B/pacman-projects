@@ -66,6 +66,8 @@ class ValueIterationAgent(ValueEstimationAgent):
           value iteration, V_k+1(...) depends on V_k(...)'s.
         """
         "*** YOUR CODE HERE ***"
+
+        V_k+1 
             
     def get_value(self, state):
         """
