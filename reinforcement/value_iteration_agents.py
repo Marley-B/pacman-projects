@@ -67,7 +67,20 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        V_k+1 
+        states = mdp.get_states(self)
+        for state in states:
+            actions = mdp.get_possible_actions(self, state)
+            for k in range(self.iterations):
+                value = float('-inf')
+                s = 0
+                for action in actions:
+                    next_state, prob = mdp.get_transition_states_and_probs(self, state, action)
+                    s += (prob*get_value(self, next_state))
+                for action in actions:
+                    next_state, _ = mdp.get_transition_states_and_probs(self, state, action)
+                    value = max(value, mdp.reward(self, state, action, next_state) + discount * s)
+                self.values[state] = value
+            
             
     def get_value(self, state):
         """
