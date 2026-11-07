@@ -67,19 +67,26 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        states = mdp.get_states(self)
-        for state in states:
-            actions = mdp.get_possible_actions(self, state)
-            for k in range(self.iterations):
-                value = float('-inf')
-                s = 0
+        for k in range(self.iterations):
+            # Since we're asked to use batch update we have to ensure to access to the value k-1 without any change
+            temp_values = self.values.copy()
+            states = self.mdp.get_states()
+            for state in states:
+                if self.mdp.is_terminal(state):
+                    continue
+                
+                actions = self.mdp.get_possible_actions(state)
+                if not actions:
+                    continue
+                max_value = float('-inf')
                 for action in actions:
-                    next_state, prob = mdp.get_transition_states_and_probs(self, state, action)
-                    s += (prob*get_value(self, next_state))
-                for action in actions:
-                    next_state, _ = mdp.get_transition_states_and_probs(self, state, action)
-                    value = max(value, mdp.reward(self, state, action, next_state) + discount * s)
-                self.values[state] = value
+                    transitions = self.mdp.get_transition_states_and_probs(state, action)
+                    q_value = 0 # Initialize 0 as default
+                    for next_state, prob in transitions:
+                        q_value += prob*self.mdp.get_reward(state, action, next_state) + self.discount * prob * temp_values[next_state]
+                    if max_value < q_value:
+                        max_value = q_value
+                self.values[state] = max_value
             
             
     def get_value(self, state):
@@ -94,7 +101,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        q_value = 0
+        transitions = self.mdp.get_transition_states_and_probs(state, action)
+        for next_state, prob in transitions:
+            q_value += prob*self.mdp.get_reward(state, action, next_state) + self.discount * prob * self.values[next_state]
+        return q_value
 
     def compute_action_from_values(self, state):
         """
@@ -106,7 +117,19 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        if self.mdp.is_terminal(state):
+            return None
+        actions = self.mdp.get_possible_actions(state)
+        if not actions:
+            return None
+        max_value = float('-inf')
+        best_action = None
+        for action in actions:
+            q_value = self.compute_q_value_from_values(state, action)
+            if max_value < q_value:
+                max_value = q_value
+                best_action = action
+        return best_action
 
     def get_policy(self, state):
         return self.compute_action_from_values(state)
